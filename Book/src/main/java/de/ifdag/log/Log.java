@@ -11,7 +11,7 @@ public class Log {
 	
 
 
-	public static <T> void error(Class<T> class1, String string) {
+	public static <T> void error(String string) {
 		// TODO Auto-generated method stub
 		logger.error(string);
 	}
