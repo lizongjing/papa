@@ -1,0 +1,21 @@
+[INFO ] [15:12:49,925] us.codecraft.webmagic.Spider - Spider book.douban.com started!
+[INFO ] [15:12:49,928] us.codecraft.webmagic.downloader.HttpClientDownloader - downloading page https://book.douban.com/tag/?view=type
+[INFO ] [15:12:51,871] us.codecraft.webmagic.downloader.HttpClientDownloader - downloading page https://book.douban.com/tag/小说
+[INFO ] [15:12:53,031] us.codecraft.webmagic.downloader.HttpClientDownloader - downloading page https://book.douban.com/tag/外国文学
+[INFO ] [15:12:54,166] us.codecraft.webmagic.downloader.HttpClientDownloader - downloading page https://book.douban.com/tag/文学
+[INFO ] [15:12:55,347] us.codecraft.webmagic.downloader.HttpClientDownloader - downloading page https://book.douban.com/tag/随笔
+[INFO ] [15:23:22,149] us.codecraft.webmagic.Spider - Spider book.douban.com started!
+[INFO ] [15:23:22,152] us.codecraft.webmagic.downloader.HttpClientDownloader - downloading page https://book.douban.com/tag/?view=type
+[INFO ] [15:23:23,624] us.codecraft.webmagic.downloader.HttpClientDownloader - downloading page https://book.douban.com/tag/小说
+[INFO ] [15:23:24,815] us.codecraft.webmagic.downloader.HttpClientDownloader - downloading page https://book.douban.com/tag/外国文学
+[INFO ] [15:23:25,956] us.codecraft.webmagic.downloader.HttpClientDownloader - downloading page https://book.douban.com/tag/文学
+[INFO ] [15:23:27,108] us.codecraft.webmagic.downloader.HttpClientDownloader - downloading page https://book.douban.com/tag/随笔
+[INFO ] [15:23:28,349] us.codecraft.webmagic.downloader.HttpClientDownloader - downloading page https://book.douban.com/tag/中国文学
+[INFO ] [15:23:29,535] us.codecraft.webmagic.downloader.HttpClientDownloader - downloading page https://book.douban.com/tag/经典
+[INFO ] [15:25:15,357] us.codecraft.webmagic.Spider - Spider book.douban.com started!
+[INFO ] [15:25:15,360] us.codecraft.webmagic.downloader.HttpClientDownloader - downloading page https://book.douban.com/tag/?view=type
+[INFO ] [15:25:16,813] us.codecraft.webmagic.downloader.HttpClientDownloader - downloading page https://book.douban.com/tag/小说
+[INFO ] [15:25:18,017] us.codecraft.webmagic.downloader.HttpClientDownloader - downloading page https://book.douban.com/tag/外国文学
+[INFO ] [15:25:19,235] us.codecraft.webmagic.downloader.HttpClientDownloader - downloading page https://book.douban.com/tag/文学
+[INFO ] [15:25:19,236] org.apache.http.impl.execchain.RetryExec - I/O exception (org.apache.http.NoHttpResponseException) caught when processing request to {s}->https://book.douban.com:443: The target server failed to respond
+[INFO ] [15:25:19,237] org.apache.http.impl.execchain.RetryExec - Retrying request to {s}->https://book.douban.com:443
