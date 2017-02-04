@@ -8,6 +8,7 @@ import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.pipeline.ConsolePipeline;
 import us.codecraft.webmagic.pipeline.FilePipeline;
+import us.codecraft.webmagic.pipeline.JsonFilePipeline;
 import us.codecraft.webmagic.processor.PageProcessor;
 
 public class GetGameInfo implements PageProcessor {
@@ -52,8 +53,8 @@ public class GetGameInfo implements PageProcessor {
 		Spider.create(new GetGameInfo())
 			.addUrl("http://0day.ali213.net/all/1-act-0-2017-01-0-td-1.html")	//开始地址	
 			.addPipeline(new ConsolePipeline())	//打印到控制台
-			.addPipeline(new FilePipeline("D:\\webmagic\\Game1"))	//保存到文件夹
-			.thread(1)	//开启5线程
+			.addPipeline(new JsonFilePipeline("D:\\webmagic\\Game"))	//保存到文件夹
+			.thread(5)	//开启5线程
 			.run();
 	}
 	
