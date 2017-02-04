@@ -1,8 +1,11 @@
 package papa;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import de.ifdag.log.Log;
+import papa.bean.BookInfoBean;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.Spider;
@@ -15,11 +18,13 @@ import us.codecraft.webmagic.processor.PageProcessor;
  */
 public class DoubanBook implements PageProcessor{
 	
-	private Site site = Site.me().setRetryTimes(3).setSleepTime(2000).setTimeOut(6000);
+	private Site site = Site.me().setRetryTimes(3).setSleepTime(2000).setTimeOut(7000);
 	
 	
 //	public static final String URL_LIST = "http://www\\.36dm\\.com/sort-4-\\d+\\.html";
   //  public static final String URL_POST = "http://www\\.36dm\\.com/show-\\w+\\.html";
+	
+	SimpleDateFormat sdf   =    new   SimpleDateFormat( "yyyy-MM-dd" ); 
 	
 	public static final String URL_MAIN =  "https://book.douban.com/tag/?view=type";
     //列表页的正则表达式 
@@ -28,7 +33,7 @@ public class DoubanBook implements PageProcessor{
     public static final String URL_POST =  "https://book\\.douban\\.com/subject/.+";
     
     
-  
+    public static final String []PAINFO={"作者","出版社","副标题:","原作名","译者","出版年","页数","定价","丛书","装帧","ISBN"};
    
     
 	
@@ -56,24 +61,60 @@ public class DoubanBook implements PageProcessor{
 		else if (page.getUrl().regex(URL_POST).match()) {
 			String bookName =page.getHtml().xpath("//span[@property=\"v:itemreviewed\"]/text()").get();
 			String temp =page.getHtml().xpath("//div[@id=\"info\"]").get();
-			System.out.println(temp);
-			String hrefArg[] =temp.split("</a>");
-			String [] zuozhe=hrefArg[0].split(">");
-		    String writerInfo = zuozhe[zuozhe.length-1];
-		    
-		    zuozhe=hrefArg[1].split(">");
-		    String translator = zuozhe[zuozhe.length-1];
-		    
-		    String otherInfo[]= temp.split("<br");
-		    int i=0;
-		    for(String o : otherInfo){
-		    	System.out.println(i+":"+o);
-		    	i++;
-		    	
-		    }
-		   System.out.println(otherInfo[1].split("span>")[1].replaceAll("\n", ""));
-		   System.out.println("--------------");
-		    
+			String lineInfo[] =temp.split("<br>");
+			String line;
+			BookInfoBean bib=new BookInfoBean();
+			String resultInfo;
+			for(int i=0; i<lineInfo.length;i++){
+				
+				line =lineInfo[i].replaceAll("\n", "");
+				for(int j=0; j<PAINFO.length;j++){
+					if(line.contains(PAINFO[j])){
+						resultInfo= getPaInfo(line);
+						switch(j) {
+						//{"作者","出版社","副标题:","原作名","译者","出版年","页数","定价","丛书","装帧","ISBN"};
+						case  0:bib.setZuozhe(resultInfo); break;
+						case  1:bib.setChubanshe(resultInfo); break;
+						case  2:bib.setFubiaoti(resultInfo); break;
+						case  3:bib.setYuanzhuoming(resultInfo); break;
+						case  4:bib.setYizhe(resultInfo); break;
+						case  5:
+							try{
+							  Date d= new Date(sdf.parse(resultInfo).getTime());
+							  bib.setChubannian(d);
+							  }
+							catch(Exception e){
+								
+							}
+							
+						break;
+						case  6:
+							try{
+									bib.setPageCount(Integer.parseInt(resultInfo)); 
+								  }
+								catch(Exception e){
+									
+								}
+							break;
+						case  7:
+							try{
+								bib.setPrice(Double.parseDouble(resultInfo));
+							  }
+							catch(Exception e){
+								
+							}
+						break;
+						case  8:bib.setCongshu(resultInfo); break;
+						case  9:bib.setZhuangzhen(resultInfo); break;
+						case  10:bib.setIsbn(resultInfo); break;
+						default: break;
+					}
+					}
+				}
+			    
+				
+			}
+			System.out.println(bib.toString());
 			
 //			String title = page.getHtml().xpath("//div[@class='location']").regex("\\[[\\S|\\s]+\\<").toString();	//匹配标题
 //            page.putField("title", title.substring(0, title.length() - 1).trim());
@@ -91,6 +132,19 @@ public class DoubanBook implements PageProcessor{
 			.addUrl("https://book.douban.com/tag/?view=type")	//开始地址	
 			.thread(1)	
 			.run();
+	}
+	public static String  getPaInfo(String str){
+		
+		String temp=str.split("</span>")[1];
+		String args[] = temp.split("</a>");
+		if(args.length>1){
+			return args[0].split(">")[1];
+			
+		}
+		else{
+			return temp.trim();
+		}
+		
 	}
 	
 }
