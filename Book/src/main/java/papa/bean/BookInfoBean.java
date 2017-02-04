@@ -4,7 +4,9 @@ import java.sql.Date;
 
 public class BookInfoBean {
 	
+	private String bookName;
 	private String zuozhe;
+	private String zuozheCountry;
 	private String chubanshe;
 	private String fubiaoti;
 	private String yuanzhuoming;
@@ -15,10 +17,11 @@ public class BookInfoBean {
 	private String zhuangzhen;
 	private String congshu;
 	private String tags;
-	private String doubanScore;
-	private String doubanScorePersonCount;
+	private double doubanScore;
+	private int doubanScorePersonCount;
 	private String isbn;
 	private String synopsis;
+	private String doubanID;
 	
 	
 	public String getZuozhe() {
@@ -90,18 +93,6 @@ public class BookInfoBean {
 	public void setTags(String tags) {
 		this.tags = tags;
 	}
-	public String getDoubanScore() {
-		return doubanScore;
-	}
-	public void setDoubanScore(String doubanScore) {
-		this.doubanScore = doubanScore;
-	}
-	public String getDoubanScorePersonCount() {
-		return doubanScorePersonCount;
-	}
-	public void setDoubanScorePersonCount(String doubanScorePersonCount) {
-		this.doubanScorePersonCount = doubanScorePersonCount;
-	}
 	public String getSynopsis() {
 		return synopsis;
 	}
@@ -115,9 +106,50 @@ public class BookInfoBean {
 		this.isbn = isbn;
 	}
 	
+	
+	
+	public double getDoubanScore() {
+		return doubanScore;
+	}
+	public void setDoubanScore(double doubanScore) {
+		this.doubanScore = doubanScore;
+	}
+	public int getDoubanScorePersonCount() {
+		return doubanScorePersonCount;
+	}
+	public void setDoubanScorePersonCount(int doubanScorePersonCount) {
+		this.doubanScorePersonCount = doubanScorePersonCount;
+	}
+	public String getZuozheCountry() {
+		return zuozheCountry;
+	}
+	public void setZuozheCountry(String zuozheCountry) {
+		this.zuozheCountry = zuozheCountry;
+	}
+	
+	
+	public String getDoubanID() {
+		return doubanID;
+	}
+	public void setDoubanID(String doubanID) {
+		this.doubanID = doubanID;
+	}
+	
+	
+	
+	public String getBookName() {
+		return bookName;
+	}
+	public void setBookName(String bookName) {
+		this.bookName = bookName;
+	}
 	public String toString(){
 		StringBuffer sb =new StringBuffer();
+		sb.append("bookName"+bookName);
+		sb.append("\n");
 		sb.append("zuozhe: "+zuozhe);
+		sb.append("\n");
+		sb.append("zuozheCountry: "+zuozheCountry);
 		sb.append("\n");
 		sb.append("chubanshe: "+chubanshe);
 		sb.append("\n");
@@ -146,6 +178,9 @@ public class BookInfoBean {
 		sb.append("isbn: "+isbn);
 		sb.append("\n");
 		sb.append("synopsis: "+synopsis);
+		sb.append("\n");
+		sb.append("doubanID: "+doubanID);
+	
 		
 		
 		return sb.toString();

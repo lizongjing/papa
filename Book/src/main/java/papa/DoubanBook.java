@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.ifdag.log.Log;
+import papa.Queue.DBQueue;
+import papa.Thread.DBInsertThread;
 import papa.bean.BookInfoBean;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
@@ -24,7 +26,9 @@ public class DoubanBook implements PageProcessor{
 //	public static final String URL_LIST = "http://www\\.36dm\\.com/sort-4-\\d+\\.html";
   //  public static final String URL_POST = "http://www\\.36dm\\.com/show-\\w+\\.html";
 	
-	SimpleDateFormat sdf   =    new   SimpleDateFormat( "yyyy-MM-dd" ); 
+	SimpleDateFormat sdf1   =    new   SimpleDateFormat( "yyyy-MM-dd" ); 
+	SimpleDateFormat sdf2   =    new   SimpleDateFormat( "yyyy-MM" ); 
+	SimpleDateFormat sdf3   =    new   SimpleDateFormat( "yyyy" ); 
 	
 	public static final String URL_MAIN =  "https://book.douban.com/tag/?view=type";
     //列表页的正则表达式 
@@ -35,6 +39,7 @@ public class DoubanBook implements PageProcessor{
     
     public static final String []PAINFO={"作者","出版社","副标题:","原作名","译者","出版年","页数","定价","丛书","装帧","ISBN"};
    
+    public static  final String  defCountry="中国";
     
 	
 	public Site getSite() {
@@ -59,11 +64,17 @@ public class DoubanBook implements PageProcessor{
         //详情页
          } 
 		else if (page.getUrl().regex(URL_POST).match()) {
+			BookInfoBean bib=new BookInfoBean();
+			String url= page.getUrl().get();
+			String argID[]=url.split("/");
+			String doubanID= argID[argID.length-1];
+			bib.setDoubanID(doubanID);
 			String bookName =page.getHtml().xpath("//span[@property=\"v:itemreviewed\"]/text()").get();
+			bib.setBookName(bookName);
 			String temp =page.getHtml().xpath("//div[@id=\"info\"]").get();
 			String lineInfo[] =temp.split("<br>");
 			String line;
-			BookInfoBean bib=new BookInfoBean();
+			
 			String resultInfo;
 			for(int i=0; i<lineInfo.length;i++){
 				
@@ -73,17 +84,57 @@ public class DoubanBook implements PageProcessor{
 						resultInfo= getPaInfo(line);
 						switch(j) {
 						//{"作者","出版社","副标题:","原作名","译者","出版年","页数","定价","丛书","装帧","ISBN"};
-						case  0:bib.setZuozhe(resultInfo); break;
+						case  0:
+						
+							String arg[] = resultInfo.split("\\]");
+							
+							String arg2[] = resultInfo.split("\\)");
+							if(arg.length>1|| arg2.length>1 ){
+								 if(arg.length>1){
+									 
+									 bib.setZuozhe(arg[1]);
+									 bib.setZuozheCountry(arg[0].split("\\[")[1]);
+								 }
+								 else{
+									 
+									 bib.setZuozhe(arg2[1]);
+									 bib.setZuozheCountry(arg2[0].split("\\(")[1]);
+								 }
+								
+							}
+							else{
+							bib.setZuozhe(resultInfo);
+							bib.setZuozheCountry(defCountry);
+							
+							}
+						
+						break;
 						case  1:bib.setChubanshe(resultInfo); break;
 						case  2:bib.setFubiaoti(resultInfo); break;
 						case  3:bib.setYuanzhuoming(resultInfo); break;
 						case  4:bib.setYizhe(resultInfo); break;
 						case  5:
 							try{
-							  Date d= new Date(sdf.parse(resultInfo).getTime());
+							  Date d= new Date(sdf1.parse(resultInfo).getTime());
 							  bib.setChubannian(d);
 							  }
 							catch(Exception e){
+								
+								try{
+									  Date d= new Date(sdf2.parse(resultInfo).getTime());
+									  bib.setChubannian(d);
+									  }
+									catch(Exception e2){
+										
+										try{
+											  Date d= new Date(sdf3.parse(resultInfo).getTime());
+											  bib.setChubannian(d);
+											  }
+											catch(Exception e3){
+												 Log.error(doubanID+" date error" );
+											}
+										
+									}
 								
 							}
 							
@@ -114,12 +165,44 @@ public class DoubanBook implements PageProcessor{
 			    
 				
 			}
-			System.out.println(bib.toString());
 			
-//			String title = page.getHtml().xpath("//div[@class='location']").regex("\\[[\\S|\\s]+\\<").toString();	//匹配标题
-//            page.putField("title", title.substring(0, title.length() - 1).trim());
-//            page.putField("torrent", page.getHtml().xpath("//p[@class='original download']").links().toString().trim());	//匹配种子
-//            System.out.println();
+			List<String> jianjie =page.getHtml().xpath("//div[@id=\"link-report\"]//div[@class=\"intro\"]/p/text()").all();
+			String jj="";
+			for(int i=0; i<jianjie.size();i++ ){
+				jj =jj+jianjie.get(i);
+			   
+			}
+			bib.setSynopsis(jj);
+			
+			List<String> tags =page.getHtml().xpath("//div[@id=\"db-tags-section\"]//div[@class=\"indent\"]//a/text()").all();
+			String bookTags="";
+			for(int i=0; i<tags.size();i++ ){
+				if(i!=0){
+					bookTags=bookTags+"#";
+				}
+				bookTags =bookTags+tags.get(i);
+			}
+			bib.setTags(bookTags);
+			String douBanScore =page.getHtml().xpath("//div[@id=\"interest_sectl\"]//strong[@class=\"ll rating_num \"]/text()").get();
+			
+			
+			String douBanScorePerSonCount =page.getHtml().xpath("//div[@id=\"interest_sectl\"]//span[@property=\"v:votes \"]/text()").get();
+			
+			try{
+			bib.setDoubanScore(Integer.parseInt(douBanScore));
+			}catch(Exception e ){
+				
+				
+			}
+			try{
+				bib.setDoubanScorePersonCount(Integer.parseInt(douBanScorePerSonCount));
+				}catch(Exception e ){
+					
+					
+				}
+			
+			DBQueue.put(bib);
+			//System.out.println(bib.toString());
 		}
 		else {
 			Log.error("error url "+page.getUrl().toString());
@@ -128,9 +211,11 @@ public class DoubanBook implements PageProcessor{
 	}
 	
 	public static void main(String[] args) {
+		
+		new DBInsertThread().start();
 		Spider.create(new DoubanBook())
 			.addUrl("https://book.douban.com/tag/?view=type")	//开始地址	
-			.thread(1)	
+			.thread(2)	
 			.run();
 	}
 	public static String  getPaInfo(String str){
