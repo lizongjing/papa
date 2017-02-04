@@ -12,6 +12,8 @@ import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.processor.PageProcessor;
+import us.codecraft.webmagic.scheduler.FileCacheQueueScheduler;
+import us.codecraft.webmagic.scheduler.RedisScheduler;
 
 /**
  * 
@@ -49,9 +51,7 @@ public class DoubanBook implements PageProcessor{
 	public void process(Page page) {
 		if(page.getUrl().get().equals(URL_MAIN)){
 			List<String> l_url = page.getHtml().xpath("//table[@class='tagCol']").links().regex(URL_LIST).all();	//所有的列表
-			List<String> temp = new ArrayList<String>();
-			temp.add(l_url.get(0));
-		    page.addTargetRequests(temp);
+		    page.addTargetRequests(l_url);
 		}
 		
 //		//列表页
@@ -189,7 +189,8 @@ public class DoubanBook implements PageProcessor{
 			String douBanScorePerSonCount =page.getHtml().xpath("//div[@id=\"interest_sectl\"]//span[@property=\"v:votes \"]/text()").get();
 			
 			try{
-			bib.setDoubanScore(Integer.parseInt(douBanScore));
+			
+			bib.setDoubanScore(Double.parseDouble(douBanScore));
 			}catch(Exception e ){
 				
 				
@@ -200,7 +201,6 @@ public class DoubanBook implements PageProcessor{
 					
 					
 				}
-			
 			DBQueue.put(bib);
 			//System.out.println(bib.toString());
 		}
@@ -214,8 +214,10 @@ public class DoubanBook implements PageProcessor{
 		
 		new DBInsertThread().start();
 		Spider.create(new DoubanBook())
-			.addUrl("https://book.douban.com/tag/?view=type")	//开始地址	
+			.addUrl("https://book.douban.com/tag/%E5%B0%8F%E8%AF%B4")	//开始地址	
 			.thread(2)	
+			//.scheduler(new FileCacheQueueScheduler("/webmagic/book/20170204/cache/"))
+			.setScheduler(new RedisScheduler("127.0.0.1"))
 			.run();
 	}
 	public static String  getPaInfo(String str){
