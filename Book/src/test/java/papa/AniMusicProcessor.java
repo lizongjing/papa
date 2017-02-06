@@ -7,6 +7,7 @@ import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.pipeline.ConsolePipeline;
 import us.codecraft.webmagic.pipeline.FilePipeline;
 import us.codecraft.webmagic.processor.PageProcessor;
+import us.codecraft.webmagic.scheduler.PriorityScheduler;
 
 /**
  * 
@@ -43,6 +44,7 @@ public class AniMusicProcessor implements PageProcessor{
 	}
 	
 	public static void main(String[] args) {
+		PriorityScheduler scheduler = new PriorityScheduler();
 		Spider.create(new AniMusicProcessor())
 			.addUrl("http://www.36dm.com/sort-4-1.html")	//开始地址	
 			.addPipeline(new ConsolePipeline())	//打印到控制台

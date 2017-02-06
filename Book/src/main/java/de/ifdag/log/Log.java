@@ -20,6 +20,11 @@ public class Log {
 		// TODO Auto-generated method stub
 		logger.error(msg,ex);
 	}
+	
+	public static void exception(Object n, Exception ex) {
+		// TODO Auto-generated method stub
+		logger.error(ex);
+	}
 
 	public static <T> void docu(Class<T> class1, String string) {
 		// TODO Auto-generated method stub
@@ -46,6 +51,11 @@ public class Log {
 		
 		logger.info(string);
 	}
+	public static void info(String string) {
+		// TODO Auto-generated method stub
+		logger.info(string);
+	}
+
 
 	
 	
