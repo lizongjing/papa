@@ -1,14 +1,20 @@
 package pagame;
 
 
+import java.util.Calendar;
 import java.util.List;
 
+import pagame.bean.GameInfo;
+import pagame.savedb.FileOperation;
+import pagame.savedb.SaveTxtDb;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.pipeline.ConsolePipeline;
 import us.codecraft.webmagic.pipeline.FilePipeline;
+import us.codecraft.webmagic.pipeline.JsonFilePipeline;
 import us.codecraft.webmagic.processor.PageProcessor;
+import us.codecraft.webmagic.scheduler.RedisScheduler;
 
 public class GetGameInfo implements PageProcessor {
 	
@@ -38,13 +44,27 @@ public class GetGameInfo implements PageProcessor {
             page.addTargetRequests(l_url);
         //详情页
         } else {
-        	System.out.println("1111111");
+//        	System.out.println("1111111");
         	String title = page.getHtml().xpath("//div[@class=\"oinfo_tit_con_tit\"]/h1/text()").toString();	//匹配标题
             page.putField("title", title.substring(0, title.length() - 1).trim());
 //            System.out.println("title=="+title.substring(0, title.length() - 1).trim());
 //            page.putField("torrent", page.getHtml().xpath("//p[@class='original download']").links().toString().trim());	//匹配种子
 //            System.out.println("page=="+page.getHtml().xpath("//p[@class='original download']").links().toString().trim());
             System.out.println();
+            
+            GameInfo gameinfo = new GameInfo();
+            gameinfo.setGamefromurl(page.getUrl().toString());
+            gameinfo.setGamename(title.substring(0, title.length() - 1).trim());
+
+//            GameInfo gameinfo1 = new GameInfo();
+//            gameinfo1 = (GameInfo) gameinfo.toString();
+            Calendar cal=Calendar.getInstance();//使用日历类
+            	int year=cal.get(Calendar.YEAR);//得到年
+            	int month=cal.get(Calendar.MONTH)+1;//得到月，因为从0开始的，所以要加1
+            	int day=cal.get(Calendar.DAY_OF_MONTH);//得到天
+            SaveTxtDb.savetxtdb(gameinfo.toString(), "gameinfo" + "_" 
+            	+ year + "-" + month + "-" + day+".txt");
+            
         }
 	}
 	
@@ -52,8 +72,9 @@ public class GetGameInfo implements PageProcessor {
 		Spider.create(new GetGameInfo())
 			.addUrl("http://0day.ali213.net/all/1-act-0-2017-01-0-td-1.html")	//开始地址	
 			.addPipeline(new ConsolePipeline())	//打印到控制台
-			.addPipeline(new FilePipeline("D:\\webmagic\\Game1"))	//保存到文件夹
-			.thread(1)	//开启5线程
+//			.addPipeline(new JsonFilePipeline("D:\\webmagic\\Game"))	//保存到文件夹
+			.setScheduler(new RedisScheduler("127.0.0.1"))
+			.thread(1)	//开启线程數量
 			.run();
 	}
 	
