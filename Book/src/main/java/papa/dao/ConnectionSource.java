@@ -28,6 +28,7 @@ public class ConnectionSource {
         
   			String serverName="192.168.100.149";
   			serverName="127.0.0.1";
+  		
   			//serverName="172.10.162.30";
             Properties p = new Properties();
             p.setProperty("driverClassName", "com.mysql.jdbc.Driver");

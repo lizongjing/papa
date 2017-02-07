@@ -8,6 +8,7 @@ import java.util.List;
 import de.ifdag.log.Log;
 import papa.Queue.DBQueue;
 import papa.Thread.DBInsertThread;
+import papa.Thread.RedisQueryThread;
 import papa.bean.BookInfoBean;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
@@ -20,7 +21,7 @@ import us.codecraft.webmagic.scheduler.RedisScheduler;
  * @author ReverieNight@Foxmail.com
  *
  */
-public class DoubanBook implements PageProcessor {
+public class DoubanBookByNo implements PageProcessor {
 
 	private static Site site = Site.me().setRetryTimes(3).setSleepTime(2000).setTimeOut(7000).setCycleRetryTimes(3);
 
@@ -33,9 +34,6 @@ public class DoubanBook implements PageProcessor {
 	SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM");
 	SimpleDateFormat sdf3 = new SimpleDateFormat("yyyy");
 
-	public static final String URL_MAIN = "https://book.douban.com/tag/?view=type";
-	// 列表页的正则表达式
-	public static final String URL_LIST = "https://book\\.douban\\.com/tag/.+";
 	// 详情页的正则表达式
 	public static final String URL_POST = "https://book\\.douban\\.com/subject/.+";
 
@@ -49,19 +47,9 @@ public class DoubanBook implements PageProcessor {
 	}
 
 	public void process(Page page) {
-		if (page.getUrl().get().equals(URL_MAIN)) {
-			List<String> l_url = page.getHtml().xpath("//table[@class='tagCol']").links().regex(URL_LIST).all(); // 所有的列表
-			page.addTargetRequests(l_url);
-		}
+		if (page.getUrl().get().equals("")) {
 
-		// //列表页
-		else if (page.getUrl().regex(URL_LIST).match()) {
-			List<String> l_url = page.getHtml().xpath("//a[@class=\"nbg\"]").links().regex(URL_POST).all(); // 目标详情
-			List<String> list_url = page.getHtml().xpath("//span[@class=\"next\"]").links().regex(URL_LIST).all();
-			;
 
-			page.addTargetRequests(list_url);
-			page.addTargetRequests(l_url);
 			// 详情页
 		} else if (page.getUrl().regex(URL_POST).match()) {
 			BookInfoBean bib = new BookInfoBean();
@@ -220,11 +208,20 @@ public class DoubanBook implements PageProcessor {
 	public static void main(String[] args) {
 		  List<String[]> poolHosts = new ArrayList<String[]>();
 		  poolHosts.add(new String[]{"","","116.226.136.135","8118"});
-		    site.setHttpProxyPool(poolHosts,false);
+		  
+		  
+		  
+		 site.setHttpProxyPool(poolHosts,false);
 
 		
 		new DBInsertThread().start();
-		Spider.create(new DoubanBook())
+		new RedisQueryThread("127.0.0.1").start();
+		
+		
+		
+		
+//		
+		Spider.create(new DoubanBookByNo())
 			.addUrl("https://book.douban.com/tag/%E5%B0%8F%E8%AF%B4")	//开始地址	
 			.thread(2)	
 			//.scheduler(new FileCacheQueueScheduler("/webmagic/book/20170204/cache/"))
