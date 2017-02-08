@@ -1,11 +1,13 @@
 package pagame;
 
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 import pagame.bean.GameInfo;
 import pagame.savedb.FileOperation;
+import pagame.savedb.SaveDb;
 import pagame.savedb.SaveTxtDb;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
@@ -52,18 +54,26 @@ public class GetGameInfo implements PageProcessor {
 //            System.out.println("page=="+page.getHtml().xpath("//p[@class='original download']").links().toString().trim());
             System.out.println();
             
+            /**
+            //txt存储数据
             GameInfo gameinfo = new GameInfo();
             gameinfo.setGamefromurl(page.getUrl().toString());
             gameinfo.setGamename(title.substring(0, title.length() - 1).trim());
 
-//            GameInfo gameinfo1 = new GameInfo();
-//            gameinfo1 = (GameInfo) gameinfo.toString();
             Calendar cal=Calendar.getInstance();//使用日历类
             	int year=cal.get(Calendar.YEAR);//得到年
             	int month=cal.get(Calendar.MONTH)+1;//得到月，因为从0开始的，所以要加1
             	int day=cal.get(Calendar.DAY_OF_MONTH);//得到天
             SaveTxtDb.savetxtdb(gameinfo.toString(), "gameinfo" + "_" 
-            	+ year + "-" + month + "-" + day+".txt");
+            	+ year + "-" + month + "-" + day+".txt");*/
+            
+            List<Object> params = new ArrayList<Object>(); 
+            params.add(title.substring(0, title.length() - 1).trim()); 
+            params.add(""); 
+            params.add(""); 
+            params.add(""); 
+            params.add(page.getUrl().toString()); 
+            SaveDb.savedb(SqlConfigure.sql,params);
             
         }
 	}
