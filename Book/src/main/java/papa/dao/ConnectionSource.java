@@ -28,14 +28,15 @@ public class ConnectionSource {
         
   			String serverName="192.168.100.149";
   			serverName="127.0.0.1";
+  		
   			//serverName="172.10.162.30";
             Properties p = new Properties();
             p.setProperty("driverClassName", "com.mysql.jdbc.Driver");
             p.setProperty("url", "jdbc:mysql://"+serverName+":3306/book?useUnicode=true&characterEncoding=utf-8");
             p.setProperty("password", "etrans");
             p.setProperty("username", "root");
-            p.setProperty("maxActive", "12");
-            p.setProperty("maxIdle", "6");
+            p.setProperty("maxActive", "20");
+            p.setProperty("maxIdle", "12");
             p.setProperty("maxWait", "1000");
             p.setProperty("testOnBorrow", "true");
             p.setProperty("testWhileIdle", "true");

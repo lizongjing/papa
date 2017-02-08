@@ -1,6 +1,8 @@
 package papa;
 
+import java.sql.Connection;
 import java.sql.Date;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,11 +10,16 @@ import java.util.List;
 import de.ifdag.log.Log;
 import papa.Queue.DBQueue;
 import papa.Thread.DBInsertThread;
+import papa.Thread.RedisQueryThread;
 import papa.bean.BookInfoBean;
+import papa.dao.ConnectionSource;
+import papa.dao.SqlDao;
 import us.codecraft.webmagic.Page;
+import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.processor.PageProcessor;
+import us.codecraft.webmagic.proxy.SelfPorxy;
 import us.codecraft.webmagic.scheduler.RedisScheduler;
 
 /**
@@ -20,7 +27,7 @@ import us.codecraft.webmagic.scheduler.RedisScheduler;
  * @author ReverieNight@Foxmail.com
  *
  */
-public class DoubanBook implements PageProcessor {
+public class DoubanBookByNo implements PageProcessor {
 
 	private static Site site = Site.me().setRetryTimes(3).setSleepTime(2000).setTimeOut(7000).setCycleRetryTimes(3);
 
@@ -32,16 +39,20 @@ public class DoubanBook implements PageProcessor {
 	SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd");
 	SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM");
 	SimpleDateFormat sdf3 = new SimpleDateFormat("yyyy");
+	static Connection conn=null;
 
-	public static final String URL_MAIN = "https://book.douban.com/tag/?view=type";
-	// 列表页的正则表达式
-	public static final String URL_LIST = "https://book\\.douban\\.com/tag/.+";
 	// 详情页的正则表达式
 	public static final String URL_POST = "https://book\\.douban\\.com/subject/.+";
+	
+	public static final String URL_MAIN="https://book.douban.com/tag/%E5%B0%8F%E8%AF%B4";
 
 	public static final String[] PAINFO = { "作者", "出版社", "副标题:", "原作名", "译者", "出版年", "页数", "定价", "丛书", "装帧", "ISBN" };
 
 	public static final String defCountry = "中国";
+	
+	
+	public static final  int selfID=11;
+	
 
 	public Site getSite() {
 
@@ -49,21 +60,8 @@ public class DoubanBook implements PageProcessor {
 	}
 
 	public void process(Page page) {
-		if (page.getUrl().get().equals(URL_MAIN)) {
-			List<String> l_url = page.getHtml().xpath("//table[@class='tagCol']").links().regex(URL_LIST).all(); // 所有的列表
-			page.addTargetRequests(l_url);
-		}
-
-		// //列表页
-		else if (page.getUrl().regex(URL_LIST).match()) {
-			List<String> l_url = page.getHtml().xpath("//a[@class=\"nbg\"]").links().regex(URL_POST).all(); // 目标详情
-			List<String> list_url = page.getHtml().xpath("//span[@class=\"next\"]").links().regex(URL_LIST).all();
-			;
-
-			page.addTargetRequests(list_url);
-			page.addTargetRequests(l_url);
-			// 详情页
-		} else if (page.getUrl().regex(URL_POST).match()) {
+		  
+		if (page.getUrl().regex(URL_POST).match()) {
 			BookInfoBean bib = new BookInfoBean();
 			String url = page.getUrl().get();
 			String argID[] = url.split("/");
@@ -217,19 +215,41 @@ public class DoubanBook implements PageProcessor {
 		}
 	}
 
-	public static void main(String[] args) {
-		  List<String[]> poolHosts = new ArrayList<String[]>();
+	
+	public static void setProxyPool(){
+		
+		 List<String[]> poolHosts = new ArrayList<String[]>();
 		  poolHosts.add(new String[]{"","","116.226.136.135","8118"});
-		    site.setHttpProxyPool(poolHosts,false);
+		
+		
+			site.setHttpProxyPool(poolHosts, false);
+		 
 
 		
+	}
+	
+	public static void main(String[] args) {
+		 
+		setProxyPool();
 		new DBInsertThread().start();
-		Spider.create(new DoubanBook())
+	
+		
+		
+		RedisScheduler rs  = new RedisScheduler("127.0.0.1");
+
+		Spider sp =Spider.create(new DoubanBookByNo())
 			.addUrl("https://book.douban.com/tag/%E5%B0%8F%E8%AF%B4")	//开始地址	
 			.thread(2)	
 			//.scheduler(new FileCacheQueueScheduler("/webmagic/book/20170204/cache/"))
-			.setScheduler(new RedisScheduler("127.0.0.1"))
-			.run();
+			.setScheduler(rs);
+		
+		new RedisQueryThread("127.0.0.1",rs,sp).start();
+		
+		sp.run();
+		
+		
+          
+		
 		
 	}
 

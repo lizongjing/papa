@@ -9,7 +9,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.ifdag.log.Log;
 /**
  * 超时线程
  * @author xj
@@ -26,13 +25,13 @@ public class DBInsertThread  extends Thread  {
     @Override
 	public void run() {
     	Connection conn=null;
-		try {
+     	 try {
 			conn = ConnectionSource.getConnection();
 		} catch (SQLException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		SqlDao dao =new SqlDao(conn);
+     	SqlDao dao =new SqlDao(conn);
 	   List<BookInfoBean> bib= new ArrayList<BookInfoBean>();
 	   BookInfoBean bi;
 	   int cc=0;
@@ -44,10 +43,10 @@ public class DBInsertThread  extends Thread  {
     		 
     		 if(cc>insertBufferTime){
     			 if(bib.size()>0){
+    			
     				 dao.insertBookInfo(bib);
     				 bib= new ArrayList<BookInfoBean>();
     			 }
-    			 
     			 
     		 }
     		 
