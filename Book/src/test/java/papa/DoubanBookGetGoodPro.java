@@ -27,7 +27,7 @@ import us.codecraft.webmagic.scheduler.RedisScheduler;
  * @author ReverieNight@Foxmail.com
  *
  */
-public class DoubanBookByNo implements PageProcessor {
+public class DoubanBookGetGoodPro implements PageProcessor {
 
 	private static Site site = Site.me().setRetryTimes(3).setSleepTime(2000).setTimeOut(7000).setCycleRetryTimes(3);
 
@@ -50,6 +50,7 @@ public class DoubanBookByNo implements PageProcessor {
 
 	public static final String defCountry = "中国";
 	
+	public static final int MaxProxy=200;
 	
 	public static final  int selfID=11;
 	
@@ -219,10 +220,29 @@ public class DoubanBookByNo implements PageProcessor {
 	public static void setProxyPool(){
 		
 		 List<String[]> poolHosts = new ArrayList<String[]>();
-		  poolHosts.add(new String[]{"","","116.226.136.135","8118"});
 		
+			try {
+				conn = ConnectionSource.getConnection();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			SqlDao dao =new SqlDao(conn);
+		    
+			List<String []>list =dao.getporxyList(selfID);
+			
+			if(list.size()<MaxProxy){
+		    	dao.updateProxyIP(selfID, 0);
+		    	list.addAll(dao.getporxyList(selfID));
+			}
 		
-			site.setHttpProxyPool(poolHosts, false);
+			for(String [] s:  list){
+				  poolHosts.add(new String[]{"","",s[0],s[1]});
+			}
+			
+		
+			
+			site.setHttpProxyPool(new SelfPorxy(poolHosts, false));
 		 
 
 		
@@ -232,23 +252,15 @@ public class DoubanBookByNo implements PageProcessor {
 		 
 		setProxyPool();
 		new DBInsertThread().start();
-	
-		
-		
 		RedisScheduler rs  = new RedisScheduler("127.0.0.1");
 
-		Spider sp =Spider.create(new DoubanBookByNo())
+		Spider sp =Spider.create(new DoubanBookGetGoodPro())
 			.addUrl("https://book.douban.com/tag/%E5%B0%8F%E8%AF%B4")	//开始地址	
-			.thread(2)	
+			.thread(10)	
 			//.scheduler(new FileCacheQueueScheduler("/webmagic/book/20170204/cache/"))
 			.setScheduler(rs);
 		
-		new RedisQueryThread("127.0.0.1",rs,sp).start();
-		
 		sp.run();
-		
-		
-          
 		
 		
 	}
