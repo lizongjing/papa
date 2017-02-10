@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import pagame.bean.GameInfo;
+import pagame.bean.GameAli213Info;
 import pagame.savedb.FileOperation;
 import pagame.savedb.SaveDb;
 import pagame.savedb.SaveTxtDb;
@@ -84,7 +84,7 @@ public class GetGameInfo implements PageProcessor {
 			.addPipeline(new ConsolePipeline())	//打印到控制台
 //			.addPipeline(new JsonFilePipeline("D:\\webmagic\\Game"))	//保存到文件夹
 			.setScheduler(new RedisScheduler("127.0.0.1"))
-			.thread(1)	//开启线程數量
+			.thread(2)	//开启线程數量
 			.run();
 	}
 	
