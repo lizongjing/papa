@@ -1,0 +1,16 @@
+
+#http://0day.ali213.net		网页创建
+
+
+
+DROP TABLE IF EXISTS `game`.`game_ali213_info`;
+
+CREATE TABLE  `game`.`game_ali213_info` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `gamename` varchar(45) NOT NULL,
+  `gametype` varchar(45) NOT NULL,
+  `play_station` varchar(45) NOT NULL,
+  `gamescore` varchar(45) NOT NULL,
+  `gamefromurl` varchar(45) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;

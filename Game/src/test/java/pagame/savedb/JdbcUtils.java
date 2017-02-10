@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;  
 import java.util.Map;  
   
-public class JdbcUtils {  
+public class JdbcUtils {
     //数据库用户名  
     private static final String USERNAME = "root";  
     //数据库密码  
@@ -224,9 +224,9 @@ public class JdbcUtils {
             for(int i = 0; i<cols_len; i++){  
                 String cols_name = metaData.getColumnName(i+1);  
                 Object cols_value = resultSet.getObject(cols_name);  
-                if(cols_value == null){  
+                if(cols_value == null){
                     cols_value = "";  
-                }  
+                }
                 Field field = cls.getDeclaredField(cols_name);  
                 field.setAccessible(true); //打开javabean的访问权限  
                 field.set(resultObject, cols_value);  

@@ -1,6 +1,6 @@
 package pagame.bean;
 
-public class GameInfo {
+public class GameAli213Info {
 	private String gamename;	//遊戲名稱
 
 	private String gametype;	//遊戲類型，例如射擊類，rpg，冒險類，動作類
