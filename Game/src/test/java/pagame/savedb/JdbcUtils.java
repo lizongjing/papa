@@ -26,16 +26,16 @@ public class JdbcUtils {
     private ResultSet resultSet;  
     
     private static JdbcUtils instance = null;  
-//    public JdbcUtils() {  
+//    public JdbcUtils() {
 //        // TODO Auto-generated constructor stub  
-//        try{  
+//        try{
 //            Class.forName(DRIVER);  
 //            System.out.println("数据库连接成功！");  
 //  
-//        }catch(Exception e){  
+//        }catch(Exception e){
 //  
-//        }  
-//    }  
+//        }
+//    }
     
     static {  
         try {  
